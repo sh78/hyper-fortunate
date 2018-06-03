@@ -1,0 +1,29 @@
+{
+  "name": "hyper-fortunate",
+  "version": "1.0.0",
+  "description": "Like the `fortune`, only with GIFs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sh78/hyper-fortunate.git"
+  },
+  "keywords": [
+    "fortune",
+    "gif",
+    "image",
+    "fun",
+    "random"
+  ],
+  "author": "Sean Henderson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sh78/hyper-fortunate/issues"
+  },
+  "homepage": "https://github.com/sh78/hyper-fortunate#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2"
+  }
+}
