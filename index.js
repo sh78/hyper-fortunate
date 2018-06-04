@@ -3,68 +3,68 @@
 const cheerio = require('cheerio');
 const request = require('request');
 
-// set some defaults for request
-// req = request.defaults({
-// 	jar: true, // save cookies to jar
-// 	rejectUnauthorized: false, 
-// 	followAllRedirects: true // allow redirection
-// });
-
-const sources = {
-	'giphy': {
+const sources = [{
+    'name': 'giphy',
 		'url': 'https://giphy.com/',
 		'imageSelector': 'img[data-gif]',
 		'pageLinkSelector': 'a[class^=_gifLink]',
-	},
-	// 'imgur': {},
-	// 'reddit': {},
-	// 'buzzfeed': {}
-};
+  }, {
+    // 'name': 'imgur',
+    // 'name': 'reddit',
+    // 'name': 'buzzfeed',
+}];
 
-class Gif {
-	constructor(source) {	
-		this.sourceURL = sources[source].url;
-	}
-	
-	get aGif() { // return a url to a raw, random gif
-		// return new Promise((resolve, reject) => {
-		return request(this.sourceURL, (error, response, html) => {
-				if (!error && response.statusCode == 200) {
-					// console.log(html);
-					const page = cheerio.load(html);
-					const gifData = page('script:contains("Giphy.renderHomepage")').html();
-					const theGifs = gifData.split('\"').filter(function (item) {
-							return item.startsWith("https") && item.endsWith('source.gif');
-					});
-					console.log(this.randomIndex(theGifs));
-					return this.randomIndex(theGifs);
-				}
-			});
-	}
-
-	randomIndex(arr) { // pick a random index of array and return it
-		let count = arr.length - 1;
-		let index = Math.floor(Math.random() * Math.floor(count));
-		// console.log(count, index);
-		return arr[index];
-	}
-
+function randomIndex(arr) { // pick a random index of array and return it
+  let count = arr.length - 1;
+  let index = Math.floor(Math.random() * Math.floor(count));
+  return arr[index];
 }
 
+const url = randomIndex(sources).url;
+const fetchGif = new Promise((resolve, reject) => {
+  request(url, (error, response, html) => {
+    if (!error && response.statusCode == 200) {
+      // console.log(html);
+      const page = cheerio.load(html);
+      // giphy renders their gif markup dynamically, and cheerio is not a browser, so
+      // find the script where giphy calls their own API
+      const gifData = page('script:contains("Giphy.renderHomepage")').html();
+      // and tear up the string OG style
+      const theGifs = gifData.split('\"').filter(function (item) {
+          return item.startsWith("http") && item.endsWith('source.gif');
+      });
+      // console.log(theGifs);
+      resolve(randomIndex(theGifs));
+    }
+  });
+});
+
+// assign gif once promise is fulfilled
+let gif;
+fetchGif.then(data => {
+  gif = data;
+});
+
+// decorate Terminal, per https://hyper.is/#extensions-api
 exports.decorateTerm = function (Term, { React }) {
 	return class extends Term {
 		render() {
-			const gif = new Gif('giphy').aGif;
 			const output = React.createElement('div', {
 				className: 'hyper-fortunate',
 				style: {
 					'zIndex': '1',
 					'width': '100%',
-				} 
+					'height': 'auto',
+					'maxHeight': '480px',
+				}
 			}, React.createElement('a', {
 					href: gif,
-			}, React.createElement('img', { 
+			}, React.createElement('img', {
 					src: gif,
+          style: {
+            'margin': '10px auto',
+            'maxWidth': '480px',
+          }
 			})));
 
 			// append out element to hyper's childrenBefore
@@ -81,10 +81,8 @@ exports.decorateConfig = function (config) {
     css: `
       .hyper-fortunate {
         width: 100%;
-        height: 200px;
       }
 			.hyper-fortunate img {
-				margin: 10px auto;
 			}
     `
   });
