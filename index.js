@@ -31,7 +31,9 @@ const fetchGif = new Promise((resolve, reject) => {
       const gifData = page('script:contains("Giphy.renderHomepage")').html();
       // and tear up the string OG style
       const theGifs = gifData.split('\"').filter(function (item) {
-          return item.startsWith("http") && item.endsWith('source.gif');
+        if (item.startsWith("http") && item.endsWith('source.gif')) {
+          return item.replace('source', 'social');
+        }
       });
       // console.log(theGifs);
       resolve(randomIndex(theGifs));
@@ -56,7 +58,13 @@ exports.decorateTerm = function (Term, { React }) {
 					'width': '100%',
 					'height': 'auto',
 					'maxHeight': '480px',
-				}
+        },
+        onClick: function(e) {
+          // console.log(e.target);
+          // remove the element with vanilla JS
+          e.target.style.display = 'none';
+
+        }
 			}, React.createElement('a', {
 					href: gif,
 			}, React.createElement('img', {
@@ -70,7 +78,16 @@ exports.decorateTerm = function (Term, { React }) {
 			// append out element to hyper's childrenBefore
 			const customChildrenBefore = Array.from(this.props.customChildrenBefore || []).concat(output);
 			return React.createElement(Term, Object.assign({}, this.props, {
-				customChildrenBefore
+				customChildrenBefore,
+        // onDecorated (term) {
+        //   console.log('decorated! ', term);
+        // },
+        // onCursorMove: (cursor) => {
+        //   console.log('cursor! ', cursor);
+        // },
+        // onTerminal: (term) => {
+        //   console.log('term! ', term);
+        // },
 			}));
 		}
 	};
@@ -144,17 +161,7 @@ exports.decorateConfig = function (config) {
 // 			const {keyCode} = event;
 
 // 			if(keyCode === 13) {
-// 				this.tellFortune();
-
-// 				store.dispatch({
-// 					type: 'SET_QUERY',
-// 					query: ' '
-// 				});
-// 			} else if (keyCode === 8) {
-// 				store.dispatch({
-// 					type: 'SET_QUERY',
-// 					query: this.props.query.slice(0, -1)
-// 				});
+// 				this.hideGif();
 // 			}
 // 		}
 

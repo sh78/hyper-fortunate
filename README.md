@@ -2,10 +2,11 @@
 
 ## TODO:
 
-- [ ] output gif to element from within React HOC render
+- [x] link the gif
+- [ ] gif hides
+  - [ ] on keyup, or the Hyper onCursorMove
+  - [x] on click
+- [x] output gif to element from within React HOC render
 - [ ] config options
-  - [ ] map to a Map of urls/selectors
-  - [ ] maybe a separate json file
-- [ ] gif hides on keyup
-	- [ ] if config says so
-- [ ] link the gif
+  - [ ] choose hi-def gifs where possible
+  - [ ] custom sources
